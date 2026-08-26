@@ -1,64 +1,66 @@
-from launch import LaunchDescription
-from launch_ros.actions import Node
-from launch.actions import TimerAction
+"""IMU filter chain: optional static calibration, then a complementary filter.
+
+Chain, when the calibration file is present:
+    /ros_robot_controller/imu_raw -> apply_calib -> imu_corrected -> filter -> imu
+Without it, apply_calib is skipped and the filter runs straight off the raw topic.
+
+Changes from Hiwonder upstream:
+  - the calibration YAML lives in this package rather than the `calibration`
+    package, which this fork does not ship
+  - a missing calibration file degrades to the uncalibrated chain instead of
+    raising FileNotFoundError and aborting the whole launch
+  - executable is apply_calib_node, which is what the ROS 2 port of imu_calib
+    actually builds (upstream called apply_calib, a ROS 1 name)
+"""
+
 import os
+
 from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import TimerAction
+from launch_ros.actions import Node
+
+RAW_TOPIC = '/ros_robot_controller/imu_raw'
+
 
 def generate_launch_description():
-    compiled = os.environ.get('need_compile', 'False')
-    if compiled == 'True':
-        calibration_package_path = get_package_share_directory('calibration')
-    else:
-        calibration_package_path = '/home/ubuntu/ros2_ws/src/calibration'
-    
-    calib_file_path = os.path.join(calibration_package_path, 'config/imu_calib.yaml')
-    if not os.path.exists(calib_file_path):
-        raise FileNotFoundError(f"Calibration file not found: {calib_file_path}")
+    calib_file = os.path.join(get_package_share_directory('peripherals'), 'config', 'imu_calib.yaml')
+    have_calib = os.path.exists(calib_file)
 
-    imu_calib_node = Node(
-        package='imu_calib',
-        executable='apply_calib',
-        name='imu_calib',
-        output='screen',
-        parameters=[{"calib_file": calib_file_path}],
-        remappings=[
-            ('raw', '/ros_robot_controller/imu_raw'),
-            ('corrected', 'imu_corrected')
-        ]
-    )
+    nodes = []
+    filter_input = RAW_TOPIC
 
-    imu_filter_node = Node(
+    if have_calib:
+        nodes.append(Node(
+            package='imu_calib',
+            executable='apply_calib_node',
+            name='imu_calib',
+            output='screen',
+            parameters=[{'calib_file': calib_file}],
+            remappings=[
+                ('raw', RAW_TOPIC),
+                ('corrected', 'imu_corrected'),
+            ],
+        ))
+        filter_input = 'imu_corrected'
+
+    nodes.append(Node(
         package='imu_complementary_filter',
         executable='complementary_filter_node',
         name='imu_filter',
         output='screen',
-        parameters=[
-            {
-                'use_mag': False,
-                'do_bias_estimation': True,
-                'do_adaptive_gain': True,
-                'publish_debug_topics': True
-            }
-        ],
+        parameters=[{
+            'use_mag': False,
+            'do_bias_estimation': True,
+            'do_adaptive_gain': True,
+            'publish_debug_topics': True,
+        }],
         remappings=[
             ('/tf', 'tf'),
-            ('/imu/data_raw', 'imu_corrected'),
-            ('imu/data', 'imu')
-        ]
-    )
+            ('/imu/data_raw', filter_input),
+            ('imu/data', 'imu'),
+        ],
+    ))
 
-    return LaunchDescription([
-        TimerAction(
-            period=5.0,
-            actions=[imu_calib_node, imu_filter_node]
-        )
-    ])
-
-if __name__ == '__main__':
-    from launch import LaunchService
-    ld = generate_launch_description()
-
-    ls = LaunchService()
-    ls.include_launch_description(ld)
-    ls.run()
-
+    # Upstream delays 5 s so the serial link to the STM32 is up first.
+    return LaunchDescription([TimerAction(period=5.0, actions=nodes)])
