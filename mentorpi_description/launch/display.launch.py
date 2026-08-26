@@ -8,7 +8,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument, TimerAction, IncludeLaunchDescription
 
 def generate_launch_description():
-    compiled = os.environ['need_compile']
+    compiled = os.environ.get('need_compile', 'True')
     namespace = LaunchConfiguration('namespace', default='')
     use_namespace = LaunchConfiguration('use_namespace', default='false')
     frame_prefix = LaunchConfiguration('frame_prefix', default='')

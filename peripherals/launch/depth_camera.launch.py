@@ -8,8 +8,8 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Grou
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    compiled = os.environ['need_compile']
-    camera_type = os.environ['DEPTH_CAMERA_TYPE']
+    compiled = os.environ.get('need_compile', 'True')
+    camera_type = os.environ.get('DEPTH_CAMERA_TYPE', 'ascamera')
     depth_camera_name_arg = DeclareLaunchArgument(
         'depth_camera_name',
         default_value='depth_cam'

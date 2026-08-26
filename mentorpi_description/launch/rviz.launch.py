@@ -12,7 +12,7 @@ from launch.actions import DeclareLaunchArgument, EmitEvent, RegisterEventHandle
 
 def generate_launch_description():
     # Get the launch directory
-    compiled = os.environ['need_compile']
+    compiled = os.environ.get('need_compile', 'True')
     if compiled == 'True':
         mentorpi_description_package_path = get_package_share_directory('mentorpi_description')
     else:

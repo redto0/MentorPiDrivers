@@ -8,7 +8,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction
 
 def generate_launch_description():
-    compiled = os.environ['need_compile']
+    compiled = os.environ.get('need_compile', 'True')
     namespace = LaunchConfiguration('namespace', default='')
     use_namespace = LaunchConfiguration('use_namespace', default='false')
     odom_frame = LaunchConfiguration('odom_frame', default='odom')

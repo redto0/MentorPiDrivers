@@ -93,7 +93,7 @@ class Controller(Node):
         self.declare_parameter('linear_correction_factor', 1.00)
         self.declare_parameter('linear_correction_factor_tank', 0.52)
         self.declare_parameter('angular_correction_factor', 1.00)
-        self.declare_parameter('machine_type', os.environ['MACHINE_TYPE'])
+        self.declare_parameter('machine_type', os.environ.get('MACHINE_TYPE', 'MentorPi_Mecanum'))
         
         self.pub_odom_topic = self.get_parameter('pub_odom_topic').value
         self.base_frame_id = self.get_parameter('base_frame_id').value

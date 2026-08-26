@@ -9,7 +9,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    compiled = os.environ['need_compile']
+    compiled = os.environ.get('need_compile', 'True')
     use_gui = LaunchConfiguration('use_gui', default='true')
     use_rviz = LaunchConfiguration('use_rviz', default='true')
     namespace = LaunchConfiguration('namespace', default='')

@@ -9,8 +9,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     # init param
-    compiled = os.environ['need_compile']
-    lidar_type = os.environ['LIDAR_TYPE']
+    compiled = os.environ.get('need_compile', 'True')
+    lidar_type = os.environ.get('LIDAR_TYPE', 'LD19')
     # Declare arguments
     lidar_frame = LaunchConfiguration('lidar_frame', default='lidar_frame')
     scan_raw = LaunchConfiguration('scan_raw', default='scan_raw')
