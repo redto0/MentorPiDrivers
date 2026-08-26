@@ -44,7 +44,7 @@ class JoystickController(Node):
         self.max_linear = self.get_parameter('max_linear').value
         self.max_angular = self.get_parameter('max_angular').value
         self.disable_servo_control = self.get_parameter('disable_servo_control').value
-        self.machine = os.environ['MACHINE_TYPE']
+        self.machine = os.environ.get('MACHINE_TYPE', 'MentorPi_Mecanum')
         self.get_logger().info('\033[1;32m%s\033[0m' % self.max_linear)
         self.servo_state_pub = self.create_publisher(SetPWMServoState, 'ros_robot_controller/pwm_servo/set_state', 1)
         self.buzzer_pub = self.create_publisher(BuzzerState, 'ros_robot_controller/set_buzzer', 1)

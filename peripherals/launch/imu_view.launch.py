@@ -5,7 +5,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    compiled = os.environ['need_compile']
+    compiled = os.environ.get('need_compile', 'True')
 
     if compiled == 'True':
         robot_controller_package_path = get_package_share_directory('ros_robot_controller')

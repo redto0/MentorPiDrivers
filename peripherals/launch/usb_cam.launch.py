@@ -4,7 +4,7 @@ from launch_ros.actions import Node  # noqa: E402
 from launch import LaunchDescription, LaunchService  # noqa: E402
 
 def generate_launch_description():
-    compiled = os.environ['need_compile']
+    compiled = os.environ.get('need_compile', 'True')
     if compiled == 'True':
         peripherals_package_path = get_package_share_directory('peripherals')
     else:

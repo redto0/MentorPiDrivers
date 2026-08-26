@@ -8,7 +8,7 @@ def generate_launch_description():
     # 声明参数(declare parameter)
     robot_name_arg = DeclareLaunchArgument(
         'robot_name',
-        default_value=os.environ['HOST'],
+        default_value=os.environ.get('HOST', 'mentorpi'),
         description='Name of the robot'
     )
 
