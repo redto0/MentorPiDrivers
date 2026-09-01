@@ -6,8 +6,13 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
     lidar_frame = LaunchConfiguration('lidar_frame', default='base_laser')
     scan_raw = LaunchConfiguration('scan_raw', default='scan_raw')
+    # overridable; default keeps the udev symlink
+    port_name = LaunchConfiguration('port_name', default='/dev/ldlidar')
     lidar_frame_arg = DeclareLaunchArgument('lidar_frame', default_value=lidar_frame)
     scan_raw_arg = DeclareLaunchArgument('scan_raw', default_value=scan_raw)
+    port_name_arg = DeclareLaunchArgument(
+        'port_name', default_value=port_name,
+        description='Serial device for the LD19.')
 
     ld19_node = Node(
         package='ldlidar_stl_ros2',
@@ -19,7 +24,7 @@ def generate_launch_description():
                 'topic_name': 'scan',
                 'product_name': 'LDLiDAR_LD19',
                 'port_baudrate': 230400,
-                'port_name': '/dev/ldlidar',
+                'port_name': port_name,
                 'frame_id': lidar_frame,
                 'laser_scan_dir': True,
                 'enable_angle_crop_func': False,
@@ -34,6 +39,7 @@ def generate_launch_description():
     return LaunchDescription([
         lidar_frame_arg,
         scan_raw_arg,
+        port_name_arg,
         ld19_node,
     ])
 

@@ -19,6 +19,10 @@ def generate_launch_description():
     lidar_frame_arg = DeclareLaunchArgument('lidar_frame',default_value='lidar_frame',description='TF frame ID for the lidar')
     scan_raw_arg = DeclareLaunchArgument('scan_raw',default_value='scan_raw',description='Topic name for lidar_raw scan data')
     scan_topic_arg = DeclareLaunchArgument('scan_topic',default_value='scan',description='Topic name for lidar scan data')
+    # forwarded to whichever driver launch is selected below
+    port_name = LaunchConfiguration('port_name', default='/dev/ldlidar')
+    port_name_arg = DeclareLaunchArgument('port_name', default_value=port_name,
+        description='Serial device for the lidar.')
 
     # Path to the launch file and package directory
     peripherals_package_path = get_package_share_directory('peripherals')
@@ -33,7 +37,8 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(lidar_launch_path),
         launch_arguments={
             'topic_name': LaunchConfiguration('scan_topic'),
-            'frame_id': LaunchConfiguration('lidar_frame')
+            'frame_id': LaunchConfiguration('lidar_frame'),
+            'port_name': port_name,
         }.items()
     )
 
@@ -60,6 +65,7 @@ def generate_launch_description():
         scan_topic_arg,
         scan_raw_arg,
         lidar_frame_arg,
+        port_name_arg,
 
         lidar_launch,
         # laser_filter_node

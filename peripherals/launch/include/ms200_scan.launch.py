@@ -10,8 +10,10 @@ def generate_launch_description():
     lidar_frame = LaunchConfiguration('lidar_frame', default='laser_frame')
     scan_raw = LaunchConfiguration('scan_raw', default='scan_raw')
 
+    port_name = LaunchConfiguration('port_name', default='/dev/ldlidar')
     lidar_frame_arg = DeclareLaunchArgument('lidar_frame', default_value=lidar_frame)
     scan_raw_arg = DeclareLaunchArgument('scan_raw', default_value=scan_raw)
+    port_name_arg = DeclareLaunchArgument('port_name', default_value=port_name)
 
     # LiDAR publisher node
     ordlidar_node = Node(
@@ -23,7 +25,7 @@ def generate_launch_description():
             {'device_model': 'MS200'},
             {'frame_id': lidar_frame},
             {'scan_topic': 'MS200/scan'},
-            {'port_name': '/dev/ldlidar'},
+            {'port_name': port_name},
             {'baudrate': 230400},
             {'angle_min': 0.0},
             {'angle_max': 360.0},
@@ -42,6 +44,7 @@ def generate_launch_description():
     # Add actions to LaunchDescription
     ord.add_action(lidar_frame_arg)
     ord.add_action(scan_raw_arg)
+    ord.add_action(port_name_arg)
     ord.add_action(ordlidar_node)
     #ord.add_action(base_link_to_laser_tf_node)
 
