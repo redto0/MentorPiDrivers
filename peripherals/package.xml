@@ -7,6 +7,10 @@
   <maintainer email="1270161395@qq.com">ubuntu</maintainer>
   <license>TODO: License declaration</license>
 
+  <!--Imported at runtime by this package's nodes. Hiwonder declared none of
+      these, so rosdep could not install them and a native build died at import.-->
+  <exec_depend>python3-numpy</exec_depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
