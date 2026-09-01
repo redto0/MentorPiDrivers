@@ -1,14 +1,40 @@
+# IMU accelerometer calibration for the MentorPi M1.
+#
+# Two key sets, same numbers. apply_calib_node (the node imu_filter.launch.py
+# actually runs) reads accel_scale/accel_bias; Hiwonder shipped this file with
+# only SM/bias, the older ROS1 imu_calib names, so the node threw
+# "bad conversion" on the missing keys and aborted the whole IMU chain.
+# accel_calib.cpp is itself inconsistent -- it loads SM/bias but saves
+# accel_scale/accel_bias -- so both are kept until that is fixed upstream.
+
+# --- read by apply_calib_node (row-major 3x3) ---
+accel_scale:
+  - 1.0027189161413501
+  - 0.0029195051409736396
+  - 0.005502853905030352
+  - 0.002254067645694665
+  - 0.9968926618751824
+  - -0.029198459076290564
+  - -0.017633107671166413
+  - 0.0257263485242885
+  - 1.0046225030618148
+accel_bias:
+  - 0.3691974202042566
+  - 0.6600130750664271
+  - 0.22423803301923687
+
+# --- read by AccelCalib::loadCalib, same values ---
 SM:
   - 1.0027189161413501
   - 0.0029195051409736396
-  - 0.0055028539050303521
-  - 0.0022540676456946651
-  - 0.99689266187518244
+  - 0.005502853905030352
+  - 0.002254067645694665
+  - 0.9968926618751824
   - -0.029198459076290564
   - -0.017633107671166413
-  - 0.025726348524288501
+  - 0.0257263485242885
   - 1.0046225030618148
 bias:
-  - 0.36919742020425661
-  - 0.66001307506642715
+  - 0.3691974202042566
+  - 0.6600130750664271
   - 0.22423803301923687
