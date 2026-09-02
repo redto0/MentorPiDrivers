@@ -21,6 +21,7 @@ def launch_setup(context):
     imu_frame = LaunchConfiguration('imu_frame', default='imu_link')
     frame_prefix = LaunchConfiguration('frame_prefix', default='')
     use_description = LaunchConfiguration('use_description', default='true')
+    pub_odom_topic = LaunchConfiguration('pub_odom_topic', default='true')
 
     namespace_arg = DeclareLaunchArgument('namespace', default_value=namespace)
     use_namespace_arg = DeclareLaunchArgument('use_namespace', default_value=use_namespace)
@@ -32,6 +33,7 @@ def launch_setup(context):
     imu_frame_arg = DeclareLaunchArgument('imu_frame', default_value=imu_frame)
     frame_prefix_arg = DeclareLaunchArgument('frame_prefix', default_value=frame_prefix)
     use_description_arg = DeclareLaunchArgument('use_description', default_value=use_description)
+    pub_odom_topic_arg = DeclareLaunchArgument('pub_odom_topic', default_value=pub_odom_topic)
 
     if compiled == 'True':
         peripherals_package_path = get_package_share_directory('peripherals')
@@ -51,7 +53,8 @@ def launch_setup(context):
             'frame_prefix': frame_prefix,
             'base_frame': base_frame,
             'odom_frame': odom_frame,
-            'use_description': use_description
+            'use_description': use_description,
+            'pub_odom_topic': pub_odom_topic
         }.items()
     )
 
@@ -92,6 +95,7 @@ def launch_setup(context):
         imu_frame_arg,
         frame_prefix_arg,
         use_description_arg,
+        pub_odom_topic_arg,
         imu_filter_launch,
         odom_publisher_launch,
         ekf_filter_node,

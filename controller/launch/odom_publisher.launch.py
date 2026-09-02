@@ -4,6 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription, LaunchService
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, PushRosNamespace
+from launch_ros.parameter_descriptions import ParameterValue
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction
 from launch.conditions import IfCondition
@@ -19,6 +20,8 @@ def generate_launch_description():
     # Off when a parent already ran the description; on by default so this
     # launch still works standalone.
     use_description = LaunchConfiguration('use_description', default='true')
+    # Off when something else supplies odometry; the node still drives the motors.
+    pub_odom_topic = LaunchConfiguration('pub_odom_topic', default='true')
 
     namespace_arg = DeclareLaunchArgument('namespace', default_value=namespace)
     use_namespace_arg = DeclareLaunchArgument('use_namespace', default_value=use_namespace)
@@ -27,6 +30,7 @@ def generate_launch_description():
     imu_frame_arg = DeclareLaunchArgument('imu_frame', default_value=imu_frame)
     frame_prefix_arg = DeclareLaunchArgument('frame_prefix', default_value=frame_prefix)
     use_description_arg = DeclareLaunchArgument('use_description', default_value=use_description)
+    pub_odom_topic_arg = DeclareLaunchArgument('pub_odom_topic', default_value=pub_odom_topic)
 
     if compiled == 'True':
         rosmentor_description_package_path = get_package_share_directory('mentorpi_description')
@@ -67,7 +71,7 @@ def generate_launch_description():
         parameters=[os.path.join(controller_package_path, 'config/calibrate_params.yaml'), {
             'base_frame_id': base_frame, 
             'odom_frame_id': odom_frame,
-            'pub_odom_topic': True,
+            'pub_odom_topic': ParameterValue(pub_odom_topic, value_type=bool),
             }],  
     )
 
@@ -79,6 +83,7 @@ def generate_launch_description():
         imu_frame_arg,
         frame_prefix_arg,
         use_description_arg,
+        pub_odom_topic_arg,
         robot_description_launch,
         robot_controller_launch,
         odom_publisher_node
