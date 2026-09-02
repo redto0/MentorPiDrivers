@@ -2,6 +2,8 @@
 # encoding: utf-8
 # stm32 python sdk
 import enum
+import glob
+import os
 import time
 import queue
 import struct
@@ -96,15 +98,25 @@ class Board:
             'GAMEPAD_BUTTON_MASK_R1':        0x8000
     }
 
-    def __init__(self, device="/dev/rrc", baudrate=1000000, timeout=10):
+    # by-id carries the board's USB serial number, so it survives the
+    # re-enumeration that moves /dev/ttyACM0 -> ACM1 -> ACM2.
+    DEVICE_GLOB = "/dev/serial/by-id/usb-1a86_USB_Single_Serial_*-if00"
+
+    def __init__(self, device="/dev/rrc", baudrate=1000000, timeout=10, device_glob=None):
         self.enable_recv = False
         self.frame = []
         self.recv_count = 0
 
+        self._device = device
+        self._device_glob = device_glob or self.DEVICE_GLOB
+        self._baudrate = baudrate
+        self._timeout = timeout
+        self._reconnects = 0
+
         self.port = serial.Serial(None, baudrate, timeout=timeout)
         self.port.rts = False
         self.port.dtr = False
-        self.port.setPort(device)
+        self.port.setPort(self._resolve_device())
         self.port.open()
 
         self.state = PacketControllerState.PACKET_CONTROLLER_STATE_STARTBYTE1
@@ -480,10 +492,53 @@ class Board:
     def enable_reception(self, enable=True):
         self.enable_recv = enable
 
+    def _resolve_device(self):
+        """Configured path first, then by-id. Either may be stale after a replug."""
+        candidates = [self._device] + sorted(glob.glob(self._device_glob))
+        for path in candidates:
+            if path and os.path.exists(path):
+                return path
+        return self._device
+
+    def _reopen(self):
+        """Close and reopen after a disconnect. Returns True once the port is back."""
+        try:
+            self.port.close()
+        except Exception:
+            pass
+        device = self._resolve_device()
+        try:
+            self.port = serial.Serial(None, self._baudrate, timeout=self._timeout)
+            self.port.rts = False
+            self.port.dtr = False
+            self.port.setPort(device)
+            self.port.open()
+        except Exception:
+            return False
+        # A half-read packet does not survive the gap.
+        self.state = PacketControllerState.PACKET_CONTROLLER_STATE_STARTBYTE1
+        self.frame = []
+        self.recv_count = 0
+        self._reconnects += 1
+        print(f"[rrc] serial reconnected on {device} (reconnect #{self._reconnects})")
+        return True
+
     def recv_task(self):
+        backoff = 0.1
         while True:
             if self.enable_recv:
-                recv_data = self.port.read()
+                try:
+                    recv_data = self.port.read()
+                    backoff = 0.1
+                except (serial.SerialException, OSError, TypeError) as e:
+                    # The device vanished (USB re-enumeration, brown-out, unplug).
+                    # Previously this killed the thread and the node went silently
+                    # dead: still running, publishing nothing, no error anywhere.
+                    print(f"[rrc] serial lost ({e}); reconnecting")
+                    while not self._reopen():
+                        time.sleep(backoff)
+                        backoff = min(backoff * 2, 2.0)
+                    continue
                 if recv_data:
                     for dat in recv_data:
                         # print("%0.2X "%dat)
