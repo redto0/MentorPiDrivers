@@ -6,6 +6,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, PushRosNamespace
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction
+from launch.conditions import IfCondition
 
 def generate_launch_description():
     compiled = os.environ.get('need_compile', 'True')
@@ -15,6 +16,9 @@ def generate_launch_description():
     base_frame = LaunchConfiguration('base_frame', default='base_footprint')
     imu_frame = LaunchConfiguration('imu_frame', default='imu_link')
     frame_prefix = LaunchConfiguration('frame_prefix', default='')
+    # Off when a parent already ran the description; on by default so this
+    # launch still works standalone.
+    use_description = LaunchConfiguration('use_description', default='true')
 
     namespace_arg = DeclareLaunchArgument('namespace', default_value=namespace)
     use_namespace_arg = DeclareLaunchArgument('use_namespace', default_value=use_namespace)
@@ -22,6 +26,7 @@ def generate_launch_description():
     base_frame_arg = DeclareLaunchArgument('base_frame', default_value=base_frame)
     imu_frame_arg = DeclareLaunchArgument('imu_frame', default_value=imu_frame)
     frame_prefix_arg = DeclareLaunchArgument('frame_prefix', default_value=frame_prefix)
+    use_description_arg = DeclareLaunchArgument('use_description', default_value=use_description)
 
     if compiled == 'True':
         rosmentor_description_package_path = get_package_share_directory('mentorpi_description')
@@ -42,7 +47,8 @@ def generate_launch_description():
             'use_sim_time': 'false',
             'use_namespace': use_namespace,
             'namespace': namespace,
-        }.items()
+        }.items(),
+        condition=IfCondition(use_description),
     )
 
     robot_controller_launch = IncludeLaunchDescription(
@@ -72,6 +78,7 @@ def generate_launch_description():
         base_frame_arg,
         imu_frame_arg,
         frame_prefix_arg,
+        use_description_arg,
         robot_description_launch,
         robot_controller_launch,
         odom_publisher_node
