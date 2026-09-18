@@ -36,9 +36,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0.0030 0 0.0113"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/base_link.STL"/>
+        <box size="0.2119 0.1000 0.0924"/>
       </geometry>
     </collision>
   </link>
@@ -60,9 +60,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0 -0.0074 0"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/wheel_lf_Link.STL"/>
+        <cylinder radius="0.03235" length="0.0344"/>
       </geometry>
     </collision>
   </link>
@@ -88,9 +88,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0 0.0074 0"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/wheel_rf_Link.STL"/>
+        <cylinder radius="0.03235" length="0.0344"/>
       </geometry>
     </collision>
   </link>
@@ -116,9 +116,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0 -0.0074 0"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/wheel_lb_Link.STL"/>
+        <cylinder radius="0.03235" length="0.0344"/>
       </geometry>
     </collision>
   </link>
@@ -144,9 +144,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="1.5708 0 0" xyz="0 0.0074 0"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/wheel_rb_Link.STL"/>
+        <cylinder radius="0.03235" length="0.0344"/>
       </geometry>
     </collision>
   </link>
@@ -172,9 +172,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="-0.0065 0.0007 -0.0127"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/cam_Link.STL"/>
+        <box size="0.0405 0.0898 0.0262"/>
       </geometry>
     </collision>
   </link>
@@ -200,9 +200,9 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0.0001 0.0045 -0.0175"/>
       <geometry>
-        <mesh filename="package://mentorpi_description/meshes/mecanum/lidar_Link.STL"/>
+        <box size="0.0537 0.0465 0.0350"/>
       </geometry>
     </collision>
   </link>
