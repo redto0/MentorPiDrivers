@@ -22,6 +22,9 @@ def launch_setup(context):
     frame_prefix = LaunchConfiguration('frame_prefix', default='')
     use_description = LaunchConfiguration('use_description', default='true')
     pub_odom_topic = LaunchConfiguration('pub_odom_topic', default='true')
+    # Off when a parent runs the IMU chain itself; on by default so this
+    # launch still works standalone.
+    use_imu_filter = LaunchConfiguration('use_imu_filter', default='true')
 
     namespace_arg = DeclareLaunchArgument('namespace', default_value=namespace)
     use_namespace_arg = DeclareLaunchArgument('use_namespace', default_value=use_namespace)
@@ -34,6 +37,7 @@ def launch_setup(context):
     frame_prefix_arg = DeclareLaunchArgument('frame_prefix', default_value=frame_prefix)
     use_description_arg = DeclareLaunchArgument('use_description', default_value=use_description)
     pub_odom_topic_arg = DeclareLaunchArgument('pub_odom_topic', default_value=pub_odom_topic)
+    use_imu_filter_arg = DeclareLaunchArgument('use_imu_filter', default_value=use_imu_filter)
 
     if compiled == 'True':
         peripherals_package_path = get_package_share_directory('peripherals')
@@ -60,7 +64,8 @@ def launch_setup(context):
 
     imu_filter_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(peripherals_package_path, 'launch/imu_filter.launch.py')
-        ])
+        ]),
+        condition=IfCondition(use_imu_filter)
     )
 
     if use_namespace == 'false':
@@ -96,6 +101,7 @@ def launch_setup(context):
         frame_prefix_arg,
         use_description_arg,
         pub_odom_topic_arg,
+        use_imu_filter_arg,
         imu_filter_launch,
         odom_publisher_launch,
         ekf_filter_node,
