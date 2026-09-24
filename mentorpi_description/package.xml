@@ -9,6 +9,13 @@
 
   <depend>rclpy</depend>
 
+  <!--robot_description.launch.py starts these and expands the xacro; declared
+      only in the Dockerfile's apt list before, so a rosdep-driven install of a
+      clean workspace would have been missing all three.-->
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
